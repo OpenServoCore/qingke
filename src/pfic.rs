@@ -153,24 +153,28 @@ pub unsafe fn enable_vtf(channel: u8, irq: u8, address: u32) {
     // [7:0]: Numbering of VTF interrupt 0
     const PFIC_VTFIDR: *mut u32 = 0xE000E050 as *mut u32;
 
-    ptr::write_volatile(PFIC_VTFIDR, (irq as u32) << ((channel as u32) * 8));
+    unsafe {
+        ptr::write_volatile(PFIC_VTFIDR, (irq as u32) << ((channel as u32) * 8));
 
-    ptr::write_volatile(
-        PFIC_VTFADDRR0.offset(channel as isize),
-        address | 0x0000_0001,
-    );
+        ptr::write_volatile(
+            PFIC_VTFADDRR0.offset(channel as isize),
+            address | 0x0000_0001,
+        );
+    }
 }
 
 #[cfg(not(feature = "v3"))]
 pub unsafe fn disable_vtf(channel: u8) {
     assert!(channel < 4, "VTF channel must be less than 4");
-    let val = ptr::read_volatile(PFIC_VTFADDRR0.offset(channel as isize));
-    ptr::write_volatile(PFIC_VTFADDRR0.offset(channel as isize), val & 0xFFFF_FFFE);
+    unsafe {
+        let val = ptr::read_volatile(PFIC_VTFADDRR0.offset(channel as isize));
+        ptr::write_volatile(PFIC_VTFADDRR0.offset(channel as isize), val & 0xFFFF_FFFE);
+    }
 }
 
 #[cfg(feature = "critical-section-impl")]
 pub unsafe fn wfi_to_wfe(v: bool) {
-    critical_section::with(|_| {
+    critical_section::with(|_| unsafe {
         let mut val = ptr::read_volatile(PFIC_SCTLR);
         // 0x8 is WFITOWFE bit
         if v {

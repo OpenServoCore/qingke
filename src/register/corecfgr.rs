@@ -11,11 +11,11 @@ pub fn read() -> usize {
 /// Write to corecfgr
 #[inline]
 pub unsafe fn write(bits: usize) {
-    asm!("csrs 0xBC0, {}", in(reg) bits);
+    unsafe { asm!("csrs 0xBC0, {}", in(reg) bits) };
 }
 
 /// Write 0x1f to ??? (in EVT code)
 #[inline]
 pub unsafe fn set_default() {
-    write(0x1f)
+    unsafe { write(0x1f) };
 }

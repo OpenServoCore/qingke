@@ -23,14 +23,14 @@ pub fn read() -> usize {
 #[cfg(not(feature = "v2"))]
 #[inline]
 pub unsafe fn write(bits: usize) {
-    asm!("csrw 0x800, {}", in(reg) bits);
+    unsafe { asm!("csrw 0x800, {}", in(reg) bits) };
 }
 
 #[cfg(not(feature = "v2"))]
 #[inline]
 pub unsafe fn set_enable() {
     let mask = 0x8;
-    asm!("csrs 0x800, {}", in(reg) mask);
+    unsafe { asm!("csrs 0x800, {}", in(reg) mask) };
 }
 
 #[cfg(not(feature = "v2"))]

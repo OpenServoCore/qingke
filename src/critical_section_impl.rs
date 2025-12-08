@@ -10,7 +10,7 @@ unsafe impl Impl for SingleHartCriticalSection {
                 // CH32V003 (qingke_v2) does not have gintenr register
                 // Use standard RISC-V mstatus.MIE instead
                 let mut mstatus: usize;
-                core::arch::asm!("csrrci {}, mstatus, 0b1000", out(reg) mstatus);
+                unsafe { core::arch::asm!("csrrci {}, mstatus, 0b1000", out(reg) mstatus) };
                 (mstatus & 0b1000) != 0
             } else {
                 // Other QingKe cores have gintenr register
@@ -25,10 +25,10 @@ unsafe impl Impl for SingleHartCriticalSection {
         if irq_state {
             cfg_if::cfg_if! {
                 if #[cfg(feature = "v2")] {
-                    core::arch::asm!("csrsi mstatus, 0b1000");
+                    unsafe { core::arch::asm!("csrsi mstatus, 0b1000") };
                 } else {
                     use crate::register::gintenr;
-                    gintenr::set_enable();
+                    unsafe { gintenr::set_enable() };
                 }
             }
         }

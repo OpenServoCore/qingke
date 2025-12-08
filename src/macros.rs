@@ -17,7 +17,7 @@ macro_rules! set_csr {
         $(#[$attr])*
         #[inline]
         pub unsafe fn $set_field() {
-            asm!(concat!("csrs ",$csr_number,", {0}"), in(reg) $e)
+            unsafe { asm!(concat!("csrs ",$csr_number,", {0}"), in(reg) $e) }
         }
     }
 }
@@ -27,7 +27,7 @@ macro_rules! clear_csr {
         $(#[$attr])*
         #[inline]
         pub unsafe fn $clear_field() {
-            asm!(concat!("csrc ",$csr_number,", {0}"), in(reg) $e)
+            unsafe { asm!(concat!("csrc ",$csr_number,", {0}"), in(reg) $e) }
         }
     }
 }
@@ -54,7 +54,7 @@ macro_rules! write_csr {
         #[inline]
         #[allow(unused_variables)]
         unsafe fn _write(bits: usize) {
-            core::arch::asm!(concat!("csrrw x0, ", stringify!($csr_number), ", {0}"), in(reg) bits);
+            unsafe { core::arch::asm!(concat!("csrrw x0, ", stringify!($csr_number), ", {0}"), in(reg) bits) };
         }
     };
 }

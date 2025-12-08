@@ -51,5 +51,5 @@ write_csr!(0x305);
 #[inline]
 pub unsafe fn write(addr: usize, mode: TrapMode) {
     let bits = addr + mode as usize;
-    _write(bits);
+    unsafe { _write(bits) };
 }
