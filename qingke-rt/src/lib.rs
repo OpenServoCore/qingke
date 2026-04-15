@@ -199,11 +199,22 @@ unsafe extern "C" fn qingke_setup_interrupts() {
 
     unsafe {
         #[cfg(feature = "highcode")]
-        mtvec::write(0x20000000, TrapMode::VectoredAddress);
-
+        {
+            unsafe extern "C" {
+                static _highcode_vma_start: u8;
+            }
+            mtvec::write(
+                &raw const _highcode_vma_start as usize,
+                TrapMode::VectoredAddress,
+            );
+        }
         #[cfg(not(feature = "highcode"))]
-        mtvec::write(0x00000000, TrapMode::VectoredAddress);
-
+        {
+            unsafe extern "C" {
+                static _start: u8;
+            }
+            mtvec::write(&raw const _start as usize, TrapMode::VectoredAddress);
+        }
         qingke::pfic::wfi_to_wfe(true);
     }
 }

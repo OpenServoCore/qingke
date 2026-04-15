@@ -49,12 +49,12 @@ SECTIONS
         . = ALIGN(4);
     } >FLASH AT>FLASH
 
-    /* highcode section will be copied to RAM offset 0x0 */
+    /* highcode section will be copied to RAM */
     .highcode : ALIGN(4)
     {
         _highcode_lma = LOADADDR(.highcode);
         PROVIDE(_highcode_vma_start = .);
-        LONG(0x00000000); /* Placeholder for the first vector */
+        LONG(_start); /* Placeholder for the first vector */
         KEEP(*(.vector_table.core_interrupts));
         KEEP(*(.vector_table.external_interrupts));
         KEEP(*(.vector_table.exceptions));
@@ -113,3 +113,5 @@ SECTIONS
     .eh_frame (INFO) : { KEEP(*(.eh_frame)) }
     .eh_frame_hdr (INFO) : { *(.eh_frame_hdr) }
 }
+
+ASSERT(_highcode_vma_start % 1024 == 0, "vector table must be 1KB aligned for Qingke V2");
